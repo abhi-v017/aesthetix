@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only read/write their own document and its subcollections
+    // (profile, plans, dietPlans, logs). All server writes go through
+    // firebase-admin (which bypasses these rules), so this mainly protects
+    // against a compromised/misused client ID token.
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /{subcollection=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}

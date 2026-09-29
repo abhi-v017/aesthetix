@@ -1,0 +1,58 @@
+# Global Node Dependencies
+node_modules/
+/client/node_modules/
+/server/node_modules/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+/client/.env
+/server/.env
+*.pem
+*secret*
+*credentials*
+
+# Build Outputs & Artifacts
+dist/
+/client/dist/
+/client/build/
+/server/dist/
+/server/build/
+.next/
+out/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# Mac / Windows System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.sublime-workspace
+*.sublime-project
+
+# Local ML Model Cache (if Transformers.js caches locally)
+.cache/

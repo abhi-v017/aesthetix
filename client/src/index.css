@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-sand text-textMain font-body antialiased;
+}
+
+h1, h2, h3, .font-display {
+  font-family: theme('fontFamily.display');
+}
+
+/* Visible keyboard focus everywhere, per accessibility floor */
+:focus-visible {
+  outline: 2px solid theme('colors.coral');
+  outline-offset: 2px;
+}
+
+.hairline {
+  @apply border-line;
+}
+
+.input {
+  @apply border border-line rounded px-3 py-2 bg-teal text-textMain text-sm w-full shadow-neumorphic-inner focus:outline-none focus:border-coral transition-colors duration-300;
+}
+
+/* Hide scrollbar for mobile navbar */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
