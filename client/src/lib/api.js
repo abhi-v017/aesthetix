@@ -1,12 +1,16 @@
 // Thin fetch wrapper that attaches the Firebase ID token to every request
 // and centralizes error handling for the whole app.
+const API_BASE = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+
 export function makeApi(getToken) {
   async function request(path, { method = "GET", body, isFormData = false } = {}) {
     const token = await getToken();
     const headers = { Authorization: `Bearer ${token}` };
     if (!isFormData) headers["Content-Type"] = "application/json";
 
-    const res = await fetch(`/api${path}`, {
+    const endpoint = `${API_BASE}/api${path}`;
+
+    const res = await fetch(endpoint, {
       method,
       headers,
       body: isFormData ? body : body ? JSON.stringify(body) : undefined,

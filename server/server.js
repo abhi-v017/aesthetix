@@ -8,7 +8,9 @@ import dietRoutes from "./routes/diet.js";
 import foodRoutes from "./routes/food.js";
 import chatRoutes from "./routes/chat.js";
 import notifyRoutes from "./routes/notify.js";
+import seedRoutes from "./routes/seed.js";
 import { startNotificationScheduler } from "./services/notificationService.js";
+import { seedDemoUser } from "./services/seedService.js";
 
 dotenv.config();
 
@@ -28,6 +30,7 @@ app.use("/api/diet", dietRoutes);
 app.use("/api/food", foodRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/notify", notifyRoutes);
+app.use("/api/seed", seedRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error(err);
@@ -35,7 +38,10 @@ app.use((err, _req, res, _next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Fitness AI server running on http://localhost:${PORT}`);
   startNotificationScheduler();
+  seedDemoUser().catch((err) => {
+    console.warn("Auto-seeding demo user skipped:", err.message);
+  });
 });

@@ -4,6 +4,12 @@
 
 Aesthetix is a full-stack, AI-driven fitness application built with a brutalist, dark-mode neumorphic design system. It goes beyond generic advice by combining **local, on-device Machine Learning (Vision + NLP)** with the **Gemini AI API** to provide highly personalized, RAG-grounded training protocols, diet plans, and real-time AI coaching.
 
+> ### ⚡ Instant Recruiter Demo Access
+> Test the application with pre-calibrated telemetry, active 4-day split, and live macro logs:
+> - **Email**: `recruiter@aesthetix.ai`
+> - **Password**: `recruiter123`
+> *(Or tap the **1-Click Recruiter Demo Login** button on the sign-in screen)*
+
 ![Aesthetix Preview](aesthetix/homepage.png)
 
 ## ✨ Features
