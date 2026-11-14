@@ -11,24 +11,90 @@ export default function Dashboard() {
   const [plan, setPlan] = useState(null);
   const [diet, setDiet] = useState(null);
   const [today, setToday] = useState({ totals: { calories: 0, protein: 0 }, logs: [] });
+  const [completedDates, setCompletedDates] = useState([]);
+  const [streakCount, setStreakCount] = useState(0);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Dynamic 7-day streak calendar ending today
   const todayDate = new Date();
+  const formatYMD = (dateObj) => {
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const todayStr = formatYMD(todayDate);
+
+  function computeLocalStreak(dates = [], refStr = todayStr) {
+    if (!dates.length) return 0;
+    const dateSet = new Set(dates);
+    const ref = new Date(refStr);
+
+    const getOffsetDate = (offset) => {
+      const d = new Date(ref);
+      d.setDate(d.getDate() - offset);
+      return formatYMD(d);
+    };
+
+    let streak = 0;
+    let offset = 0;
+
+    // If today is not checked, check if yesterday was checked
+    if (!dateSet.has(getOffsetDate(0))) {
+      if (!dateSet.has(getOffsetDate(1))) {
+        return 0;
+      }
+      offset = 1;
+    }
+
+    while (dateSet.has(getOffsetDate(offset))) {
+      streak++;
+      offset++;
+    }
+
+    return streak;
+  }
+
   const streakDays = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(todayDate);
     d.setDate(d.getDate() - (6 - i));
-    const isToday = i === 6;
-    // Highlight completed workout days
-    const workedOut = i === 1 || i === 3 || i === 5 || isToday;
+    const dateStr = formatYMD(d);
+    const isToday = dateStr === todayStr;
+    const workedOut = completedDates.includes(dateStr);
     return {
+      dateStr,
       dayName: d.toLocaleDateString("en-US", { weekday: "short" }),
       dateNum: d.getDate(),
       isToday,
       workedOut
     };
   });
+
+  async function handleToggleDate(dateStr) {
+    // Optimistic UI update
+    const alreadyCompleted = completedDates.includes(dateStr);
+    const nextDates = alreadyCompleted
+      ? completedDates.filter((d) => d !== dateStr)
+      : [...completedDates, dateStr];
+
+    setCompletedDates(nextDates);
+    setStreakCount(computeLocalStreak(nextDates, todayStr));
+
+    try {
+      const res = await api.toggleStreak(dateStr);
+      if (res?.completedDates) {
+        setCompletedDates(res.completedDates);
+        setStreakCount(res.streak);
+      }
+    } catch (err) {
+      console.error("Streak update error:", err);
+      // Revert on error
+      setCompletedDates(completedDates);
+      setStreakCount(computeLocalStreak(completedDates, todayStr));
+    }
+  }
 
   async function refresh() {
     try {
@@ -39,6 +105,10 @@ export default function Dashboard() {
         api.getTodayFood().catch(() => ({ totals: { calories: 0, protein: 0 }, logs: [] })),
       ]);
       if (u?.profile) setProfile(u.profile);
+      if (u?.completedDates) {
+        setCompletedDates(u.completedDates);
+        setStreakCount(u.streak || computeLocalStreak(u.completedDates));
+      }
       setPlan(p?.plan || null);
       setDiet(d?.dietPlan || null);
       setToday(t || { totals: { calories: 0, protein: 0 }, logs: [] });
@@ -101,50 +171,76 @@ export default function Dashboard() {
 
       {/* Weekly Consistency Streak Card */}
       <section className="card-neu p-5 sm:p-6 mb-8 relative overflow-hidden">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-sand border border-line flex items-center justify-center text-sm shadow-neumorphic-inner">
               🔥
             </div>
             <div>
-              <h2 className="text-sm sm:text-base font-display font-bold text-textMain">Weekly Momentum</h2>
-              <p className="text-[11px] text-textSubtle">Discipline calendar across past 7 days</p>
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm sm:text-base font-display font-bold text-textMain">Weekly Momentum</h2>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-sand border border-line text-textSubtle">
+                  Interactive
+                </span>
+              </div>
+              <p className="text-[11px] text-textSubtle">Tap any day to toggle workout completion & track consistency</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full bg-coral/10 border border-coral/30 text-coral font-mono font-bold text-xs">
-              4 Day Streak
+          <div className="flex items-center gap-2 self-start sm:self-center">
+            <button
+              type="button"
+              onClick={() => handleToggleDate(todayStr)}
+              className={`btn-inset !text-xs !py-1.5 !px-3 transition-all ${
+                completedDates.includes(todayStr)
+                  ? "text-emerald border-emerald/30 font-bold"
+                  : "text-coral border-coral/30 hover:border-coral font-bold"
+              }`}
+            >
+              {completedDates.includes(todayStr) ? "✓ Today Completed" : "⚡ Check In Today"}
+            </button>
+            <span className="px-2.5 py-1.5 rounded-xl bg-coral/10 border border-coral/30 text-coral font-mono font-bold text-xs whitespace-nowrap">
+              🔥 {streakCount} {streakCount === 1 ? "Day" : "Days"}
             </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-7 gap-2 sm:gap-4 pt-2">
+        <div className="grid grid-cols-7 gap-2 sm:gap-4 pt-1">
           {streakDays.map((d, idx) => (
-            <div 
-              key={idx} 
-              className={`flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all duration-300 ${
+            <button
+              key={idx}
+              type="button"
+              onClick={() => handleToggleDate(d.dateStr)}
+              className={`flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all duration-200 group cursor-pointer active:scale-95 ${
                 d.isToday 
-                  ? "bg-sand border border-coral/40 shadow-neumorphic-inner" 
-                  : "bg-sand/40 border border-line/40 hover:bg-sand/70"
+                  ? "bg-sand border-2 border-coral/60 shadow-neumorphic-inner" 
+                  : "bg-sand/40 border border-line/40 hover:bg-sand/80 hover:border-line"
               }`}
+              title={`Click to toggle ${d.isToday ? "Today" : d.dayName} (${d.dateStr})`}
             >
-              <span className={`text-[10px] sm:text-xs font-semibold ${d.isToday ? "text-coral" : "text-textSubtle"}`}>
-                {d.dayName}
+              <span className={`text-[10px] sm:text-xs font-semibold ${d.isToday ? "text-coral font-bold" : "text-textSubtle group-hover:text-textMain"}`}>
+                {d.isToday ? "Today" : d.dayName}
               </span>
               <div
                 className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-bold text-xs sm:text-sm font-display transition-all duration-300 ${
                   d.workedOut
-                    ? "bg-coral text-ink shadow-neumorphic-coral"
-                    : "bg-teal text-textMuted border border-line shadow-neumorphic-xs"
+                    ? "bg-coral text-ink shadow-neumorphic-coral scale-105"
+                    : "bg-teal text-textMuted border border-line shadow-neumorphic-xs group-hover:text-coral group-hover:border-coral/40"
                 }`}
               >
                 {d.workedOut ? "✓" : d.dateNum}
               </div>
-              <span className="text-[9px] font-mono text-textSubtle">
+              <span className={`text-[9px] font-mono transition-colors ${d.workedOut ? "text-coral font-bold" : "text-textSubtle"}`}>
                 {d.workedOut ? "Done" : "Rest"}
               </span>
-            </div>
+            </button>
           ))}
+        </div>
+
+        <div className="mt-3.5 pt-2.5 border-t border-line/40 flex items-center justify-between text-[11px] text-textSubtle">
+          <span>💡 Tap a date tile to mark workouts or rest days</span>
+          <span className="font-mono">
+            {completedDates.includes(todayStr) ? "🎉 Today logged" : "⏳ Today pending"}
+          </span>
         </div>
       </section>
 
@@ -277,6 +373,21 @@ export default function Dashboard() {
                       </li>
                     ))}
                   </ul>
+
+                  <div className="mt-3.5 pt-2.5 border-t border-line/40 flex items-center justify-between">
+                    <span className="text-[10px] text-textSubtle font-mono">Routine Execution</span>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleDate(todayStr)}
+                      className={`btn-inset !text-[11px] !py-1 !px-2.5 transition-all ${
+                        completedDates.includes(todayStr)
+                          ? "text-emerald border-emerald/30 font-bold"
+                          : "text-coral border-coral/30 hover:border-coral font-medium"
+                      }`}
+                    >
+                      {completedDates.includes(todayStr) ? "✓ Done Today" : "Mark Done Today"}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

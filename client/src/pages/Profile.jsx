@@ -8,6 +8,7 @@ export default function Profile() {
   const api = makeApi(getToken);
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
+  const [streak, setStreak] = useState(0);
   const [notifStatus, setNotifStatus] = useState(
     typeof window !== "undefined" && "Notification" in window ? Notification.permission : "unsupported"
   );
@@ -18,6 +19,7 @@ export default function Profile() {
   useEffect(() => {
     api.getProfile().then((r) => {
       setProfile(r.profile);
+      if (r.streak !== undefined) setStreak(r.streak);
       if (r.profile?.workoutTime) setWorkoutTime(r.profile.workoutTime);
     });
   }, []);
@@ -82,6 +84,7 @@ export default function Profile() {
             <MetricCard label="Current Weight" value={`${profile.currentWeightKg} kg`} icon="⚖️" />
             <MetricCard label="Target Weight" value={`${profile.targetWeightKg} kg`} icon="🎯" />
             <MetricCard label="Activity Level" value={profile.activityLevel} icon="🏃‍♂️" />
+            <MetricCard label="Discipline Streak" value={`${streak} ${streak === 1 ? "Day" : "Days"}`} icon="🔥" />
           </div>
         ) : (
           <div className="well-neu p-6 text-center">

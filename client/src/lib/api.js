@@ -33,5 +33,7 @@ export function makeApi(getToken) {
     analyzeFood: (formData) => request("/food/analyze", { method: "POST", body: formData, isFormData: true }),
     getTodayFood: () => request("/food/today"),
     askCoach: (message) => request("/chat/ask", { method: "POST", body: { message } }),
+    toggleStreak: (date) => request("/user/streak/toggle", { method: "POST", body: { date } }),
+    getStreak: () => request("/user/streak"),
   };
 }

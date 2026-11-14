@@ -44,15 +44,34 @@ export async function seedDemoUser() {
     updatedAt: new Date().toISOString(),
   };
 
+  const today = new Date();
+  const getFormatDate = (daysAgo) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() - daysAgo);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  // Seed 4 days of completed workouts (today, yesterday, 2 days ago, 3 days ago)
+  const completedDates = [
+    getFormatDate(3),
+    getFormatDate(2),
+    getFormatDate(1),
+    getFormatDate(0),
+  ];
+
   await db.collection("users").doc(uid).set(
     {
       profile,
+      completedDates,
       fcmToken: null,
       latestReminderTimes: ["08:30", "13:00", "16:30", "20:00"],
     },
     { merge: true }
   );
-  console.log(`[Seed] Seeded profile for UID: ${uid}`);
+  console.log(`[Seed] Seeded profile and ${completedDates.length} completed dates for UID: ${uid}`);
 
   // 2. 4-Day Progressive Overload Training Protocol
   const trainingPlan = {
