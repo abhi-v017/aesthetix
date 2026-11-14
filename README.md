@@ -4,7 +4,7 @@
 
 Aesthetix is a full-stack, AI-driven fitness application built with a brutalist, dark-mode neumorphic design system. It goes beyond generic advice by combining **local, on-device Machine Learning (Vision + NLP)** with the **Gemini AI API** to provide highly personalized, RAG-grounded training protocols, diet plans, and real-time AI coaching.
 
-![Aesthetix Preview](docs/dashboard.png) <!-- Update this path to your actual hero image -->
+![Aesthetix Preview](aesthetix/homepage.png)
 
 ## ✨ Features
 
@@ -20,16 +20,18 @@ Aesthetix is a full-stack, AI-driven fitness application built with a brutalist,
 ## 📸 Screenshots
 
 <div align="center">
-  <img src="docs/dashboard.png" width="45%" alt="Dashboard" />
-  <img src="docs/diet.png" width="45%" alt="Diet Plan" />
+  <img src="aesthetix/homepage.png" width="48%" alt="Dashboard Execution View" />
+  <img src="aesthetix/diet.png" width="48%" alt="Nutrition Protocol" />
 </div>
 <br/>
 <div align="center">
-  <img src="docs/scanner.png" width="45%" alt="Food Scanner" />
-  <img src="docs/coach.png" width="45%" alt="AI Coach Chat" />
+  <img src="docs/scanner.png" width="48%" alt="AI Meal Scanner" />
+  <img src="docs/coach.png" width="48%" alt="Voice-Enabled AI Coach" />
 </div>
+<br/>
 <div align="center">
-  <em>(Replace the paths above with the actual screenshot filenames from your `docs/` folder)</em>
+  <img src="aesthetix/profile.png" width="48%" alt="Athlete Physiological Profile" />
+  <img src="aesthetix/login.png" width="48%" alt="Athlete Authentication" />
 </div>
 
 ---

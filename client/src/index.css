@@ -2,29 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-sand text-textMain font-body antialiased;
+@layer base {
+  body {
+    @apply bg-sand text-textMain font-body antialiased selection:bg-coral selection:text-ink min-h-screen;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: theme('fontFamily.display');
+    letter-spacing: -0.02em;
+  }
+
+  /* Accessible focus indicators with theme colors */
+  :focus-visible {
+    outline: 2px solid theme('colors.coral');
+    outline-offset: 2px;
+  }
 }
 
-h1, h2, h3, .font-display {
-  font-family: theme('fontFamily.display');
+@layer components {
+  /* Reusable Neumorphic Card container */
+  .card-neu {
+    @apply bg-teal border border-line/60 rounded-2xl shadow-neumorphic transition-all duration-300;
+  }
+
+  /* Inset / recessed container */
+  .well-neu {
+    @apply bg-sand/80 border border-line/50 rounded-xl shadow-neumorphic-inner transition-all duration-300;
+  }
+
+  /* Form Inputs */
+  .input {
+    @apply border border-line/70 rounded-xl px-4 py-2.5 bg-sand text-textMain text-sm w-full 
+           shadow-neumorphic-inner placeholder-textSubtle
+           focus:outline-none focus:border-coral focus:ring-1 focus:ring-coral/40
+           transition-all duration-200;
+  }
+
+  /* Neumorphic Primary Action Button */
+  .btn-coral {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl
+           bg-coral text-ink font-bold text-sm tracking-wide
+           shadow-neumorphic-sm hover:shadow-neumorphic hover:bg-coralHover
+           active:shadow-neumorphic-inner active:scale-[0.98]
+           transition-all duration-200 disabled:opacity-40 disabled:pointer-events-none;
+  }
+
+  /* Neumorphic Secondary / Surface Button */
+  .btn-neu {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
+           bg-teal text-textMain font-medium text-sm border border-line/60
+           shadow-neumorphic-sm hover:shadow-neumorphic hover:text-coral hover:border-line
+           active:shadow-neumorphic-inner active:scale-[0.98]
+           transition-all duration-200 disabled:opacity-40 disabled:pointer-events-none;
+  }
+
+  /* Neumorphic Soft Inset Button */
+  .btn-inset {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg
+           bg-sand text-textMuted font-medium text-xs border border-line/40
+           shadow-neumorphic-inner hover:text-textMain hover:border-line
+           transition-all duration-200;
+  }
+
+  /* Custom subtle scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #0d0d0d;
+    border-radius: 9999px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #262626;
+    border-radius: 9999px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #3b3b3b;
+  }
 }
 
-/* Visible keyboard focus everywhere, per accessibility floor */
-:focus-visible {
-  outline: 2px solid theme('colors.coral');
-  outline-offset: 2px;
-}
-
-.hairline {
-  @apply border-line;
-}
-
-.input {
-  @apply border border-line rounded px-3 py-2 bg-teal text-textMain text-sm w-full shadow-neumorphic-inner focus:outline-none focus:border-coral transition-colors duration-300;
-}
-
-/* Hide scrollbar for mobile navbar */
+/* Hide scrollbar utility */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
