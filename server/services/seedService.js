@@ -73,6 +73,26 @@ export async function seedDemoUser() {
   );
   console.log(`[Seed] Seeded profile and ${completedDates.length} completed dates for UID: ${uid}`);
 
+  // Seed today's workout log as Day 1
+  const todayWorkoutSession = {
+    date: getFormatDate(0),
+    dayName: "Day 1",
+    focus: "Upper Body Power & Vertical Pull",
+    exercises: [
+      "Barbell Bench Press",
+      "Weighted Pull-ups",
+      "Standing Overhead Press",
+      "Chest-Supported Row",
+    ],
+    createdAt: new Date(),
+  };
+  await db
+    .collection("users")
+    .doc(uid)
+    .collection("workoutLogs")
+    .doc(getFormatDate(0))
+    .set(todayWorkoutSession);
+
   // 2. 4-Day Progressive Overload Training Protocol
   const trainingPlan = {
     summary:

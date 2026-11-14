@@ -35,5 +35,8 @@ export function makeApi(getToken) {
     askCoach: (message) => request("/chat/ask", { method: "POST", body: { message } }),
     toggleStreak: (date) => request("/user/streak/toggle", { method: "POST", body: { date } }),
     getStreak: () => request("/user/streak"),
+    logWorkout: (data) => request("/user/workout/log", { method: "POST", body: data }),
+    unlogWorkout: (date) => request("/user/workout/unlog", { method: "POST", body: { date } }),
+    getTodayWorkout: () => request("/user/workout/today"),
   };
 }
